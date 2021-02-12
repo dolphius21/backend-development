@@ -1,16 +1,28 @@
 const express = require('express');
+const morgan = require('morgan');
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
-app.get('/', (req, res) => {
-   res.status(200).json({ message: 'Hello from the server side!', app: 'Natours' });
+// Middlewares
+app.use(morgan('dev'));
+app.use(express.json());
+
+// custom middleware
+app.use((req, res, next) => {
+   console.log('Hello from the middleware');
+   next();
 });
 
-app.post('/', (req, res) => {
-   res.send('You can post to this endpoint');
+app.use((req, res, next) => {
+   req.requestTime = new Date().toISOString();
+   next();
 });
 
-const port = 3000;
-app.listen(port, () => {
-   console.log(`App running on port ${port}...`);
-});
+// Routes
+// add ? to the parameter to make it optional so that it will not be required on the request url.
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
+
+module.exports = app;
