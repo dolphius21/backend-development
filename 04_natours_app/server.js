@@ -4,16 +4,17 @@ const app = require('./app');
 
 dotenv.config();
 
-const DB = process.env.CONN_STRING;
+const connString = process.env.CONN_STRING;
 
-mongoose
-   .connect(DB, {
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
-   })
-   .then(() => console.log('DB connection successful'));
+mongoose.connect(connString, {
+   useNewUrlParser: true,
+   useCreateIndex: true,
+   useUnifiedTopology: true,
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => console.log('DB connection successful!'));
 
 const port = process.env.PORT;
 app.listen(port, () => console.log(`App running on port ${port}...`));
